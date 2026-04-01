@@ -1,18 +1,11 @@
-import type { MaterialIcons } from "@expo/vector-icons";
 import { router, useSegments } from "expo-router";
 import type { ReactNode } from "react";
 import { Animated, StyleSheet, View } from "react-native";
-import { Header } from "@/components/Header";
+import { Header, type HeaderRightAction } from "@/components/Header";
 import { SwipeBackContainer } from "@/components/SwipeBackContainer";
 import { useInvertColors } from "@/contexts/InvertColorsContext";
 import { useScrollIndicator } from "@/hooks/useScrollIndicator";
 import { n } from "@/utils/scaling";
-
-interface RightAction {
-  icon: keyof typeof MaterialIcons.glyphMap;
-  onPress: () => void;
-  show?: boolean;
-}
 
 interface ContentContainerProps {
   children?: ReactNode;
@@ -20,7 +13,7 @@ interface ContentContainerProps {
   contentWidth?: "wide" | "normal";
   headerTitle?: string;
   hideBackButton?: boolean;
-  rightAction?: RightAction;
+  rightAction?: HeaderRightAction;
 }
 
 export default function ContentContainer({
@@ -143,6 +136,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   content: {
+    flexGrow: 1,
     justifyContent: "flex-start",
     alignItems: "flex-start",
     paddingHorizontal: n(37),

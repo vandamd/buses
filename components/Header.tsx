@@ -6,7 +6,7 @@ import { n } from "@/utils/scaling";
 import { HapticPressable } from "./HapticPressable";
 import { StyledText } from "./StyledText";
 
-interface RightAction {
+export interface HeaderRightAction {
   icon: keyof typeof MaterialIcons.glyphMap;
   onPress: () => void;
   show?: boolean;
@@ -15,7 +15,7 @@ interface RightAction {
 interface HeaderProps {
   headerTitle?: string;
   hideBackButton?: boolean;
-  rightAction?: RightAction;
+  rightAction?: HeaderRightAction;
 }
 
 export function Header({

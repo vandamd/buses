@@ -7,7 +7,6 @@ import { HapticPressable } from "./HapticPressable";
 
 export interface TabConfigItem {
   iconName: keyof typeof MaterialIcons.glyphMap;
-  name: string;
   screenName: string;
 }
 

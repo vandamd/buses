@@ -1,29 +1,33 @@
-<img src="assets/images/example.png" alt="Example Template Screenshots">
+<img src="assets/images/example.png" alt="Buses app screenshots">
 
-<p>A minimal Expo template to create a LightOS-inspired app.</p>
-
-> [!NOTE]
-> This is very much a WIP. There's a lot of things I want to add but it'll take me a bit of time :)
+<p>A bus-only Expo app built on the LightOS-style template.</p>
 
 ## Quick Start
 
-1. Update `app.json` with your app name, slug, and package name
-2. Run `bun dev`
+1. Run `bun install`
+2. Add any runtime keys you want to use:
+   - `EXPO_PUBLIC_MAPTILER_KEY` for vehicle maps
+   - `EXPO_PUBLIC_FIRST_BUS_API_KEY` for First Bus occupancy enrichment
+   - `EXPO_PUBLIC_BODS_API_KEY` for BODS occupancy enrichment
+3. Run `bun dev`
 
 ## Commands
 
 ```bash
-bun dev  # Build and run
-bun run sync-version   # Sync version across files
-bun run generate-icon  # Generate icon from app name
+bun dev                      # Build and run
+bun run sync-version         # Sync version across files
+bun run generate-icon        # Generate icon from app name
 bun run generate-readme-image  # Generate README example image
+bun run build-stops-db       # Rebuild bundled local stop search database
 ```
 
-## GitHub Releases
+## Search Data
 
-Trigger the workflow manually in Actions tab. It builds an APK and creates a GitHub release tagged with the version from `app.json`. Changelog is auto-generated from commits since the last release.
+The app bundles `assets/data/stops.db` so stop search works quickly offline-first. Rebuild it from NaPTAN with `bun run build-stops-db` when you want to refresh the dataset.
 
-Requires `EXPO_TOKEN` secret in repo settings.
+## Maps And Live Data
+
+Stop details, browsing, and vehicle tracking use live bustimes data. Vehicle maps require `EXPO_PUBLIC_MAPTILER_KEY`; if it is missing, the tracking screen shows a clear setup message instead of a blank map.
 
 ## Detailed Docs
 

@@ -5,14 +5,18 @@
       "name": "appname",
       "dependencies": {
         "@expo/vector-icons": "^15.0.3",
+        "@maplibre/maplibre-react-native": "^10.4.2",
         "@react-native-async-storage/async-storage": "^2.2.0",
         "expo": "~55.0.9",
+        "expo-asset": "~55.0.10",
         "expo-constants": "~55.0.0",
+        "expo-file-system": "~55.0.12",
         "expo-font": "^55.0.4",
         "expo-haptics": "~55.0.0",
         "expo-linking": "~55.0.0",
         "expo-router": "~55.0.0",
         "expo-splash-screen": "^55.0.13",
+        "expo-sqlite": "~55.0.11",
         "expo-system-ui": "~55.0.0",
         "react": "19.2.0",
         "react-native": "0.83.4",
@@ -330,6 +334,8 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
+    "@maplibre/maplibre-react-native": ["@maplibre/maplibre-react-native@10.4.2", "", { "dependencies": { "@turf/distance": "^7.1.0", "@turf/helpers": "^7.1.0", "@turf/length": "^7.1.0", "@turf/nearest-point-on-line": "^7.1.0", "debounce": "^2.2.0" }, "peerDependencies": { "@expo/config-plugins": ">=7", "@types/geojson": "^7946.0.0", "@types/react": ">=16.6.1", "react": ">=16.6.1", "react-native": ">=0.59.9" }, "optionalPeers": ["@expo/config-plugins", "@types/geojson", "@types/react"] }, "sha512-5qAfaEe66eMXyILklm2DMHwyaXwXxsZWVop4BqfU7AyTg13LHAcaMmLJNJ3jPkMtiJvjH2m8ywGnobdIg2I0lg=="],
+
     "@radix-ui/primitive": ["@radix-ui/primitive@1.1.3", "", {}, "sha512-JTF99U/6XIjCBo0wqkU5sK10glYe27MRRsfwoiq5zzOEZLHU3A3KCMa5X/azekYRCJ0HlwI0crAXS/5dEHTzDg=="],
 
     "@radix-ui/react-collection": ["@radix-ui/react-collection@1.1.7", "", { "dependencies": { "@radix-ui/react-compose-refs": "1.1.2", "@radix-ui/react-context": "1.1.2", "@radix-ui/react-primitive": "2.1.3", "@radix-ui/react-slot": "1.2.3" }, "peerDependencies": { "@types/react": "*", "@types/react-dom": "*", "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc", "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc" }, "optionalPeers": ["@types/react", "@types/react-dom"] }, "sha512-Fh9rGN0MoI4ZFUNyfFVNU4y9LUz93u9/0K+yLgA2bwRojxM8JU1DyvvMBabnZPBgMWREAJvU2jjVzq+LrFUglw=="],
@@ -416,6 +422,18 @@
 
     "@sinonjs/fake-timers": ["@sinonjs/fake-timers@10.3.0", "", { "dependencies": { "@sinonjs/commons": "^3.0.0" } }, "sha512-V4BG07kuYSUkTCSBHG8G8TNhM+F19jXFWnQtzj+we8DrkpSBCee9Z3Ms8yiGer/dlmhe35/Xdgyo3/0rQKg7YA=="],
 
+    "@turf/distance": ["@turf/distance@7.3.4", "", { "dependencies": { "@turf/helpers": "7.3.4", "@turf/invariant": "7.3.4", "@types/geojson": "^7946.0.10", "tslib": "^2.8.1" } }, "sha512-9drWgd46uHPPyzgrcRQLgSvdS/SjVlQ6ZIBoRQagS5P2kSjUbcOXHIMeOSPwfxwlKhEtobLyr+IiR2ns1TfF8w=="],
+
+    "@turf/helpers": ["@turf/helpers@7.3.4", "", { "dependencies": { "@types/geojson": "^7946.0.10", "tslib": "^2.8.1" } }, "sha512-U/S5qyqgx3WTvg4twaH0WxF3EixoTCfDsmk98g1E3/5e2YKp7JKYZdz0vivsS5/UZLJeZDEElOSFH4pUgp+l7g=="],
+
+    "@turf/invariant": ["@turf/invariant@7.3.4", "", { "dependencies": { "@turf/helpers": "7.3.4", "@types/geojson": "^7946.0.10", "tslib": "^2.8.1" } }, "sha512-88Eo4va4rce9sNZs6XiMJowWkikM3cS2TBhaCKlU+GFHdNf8PFEpiU42VDU8q5tOF6/fu21Rvlke5odgOGW4AQ=="],
+
+    "@turf/length": ["@turf/length@7.3.4", "", { "dependencies": { "@turf/distance": "7.3.4", "@turf/helpers": "7.3.4", "@turf/meta": "7.3.4", "@types/geojson": "^7946.0.10", "tslib": "^2.8.1" } }, "sha512-Dg1GnQ/B2go5NIWXt91N4L7XTjIgIWCftBSYIXkrpIM7QGjItzglek0Z5caytvb8ZRWXzZOGs8//+Q5we91WuQ=="],
+
+    "@turf/meta": ["@turf/meta@7.3.4", "", { "dependencies": { "@turf/helpers": "7.3.4", "@types/geojson": "^7946.0.10", "tslib": "^2.8.1" } }, "sha512-tlmw9/Hs1p2n0uoHVm1w3ugw1I6L8jv9YZrcdQa4SH5FX5UY0ATrKeIvfA55FlL//PGuYppJp+eyg/0eb4goqw=="],
+
+    "@turf/nearest-point-on-line": ["@turf/nearest-point-on-line@7.3.4", "", { "dependencies": { "@turf/distance": "7.3.4", "@turf/helpers": "7.3.4", "@turf/invariant": "7.3.4", "@turf/meta": "7.3.4", "@types/geojson": "^7946.0.10", "tslib": "^2.8.1" } }, "sha512-DQrP3lRju83rIXFN68tUEpc7ki/eRwdwBkK2CTT4RAcyCxbcH2NGJPQv8dYiww/Ar77u1WLVn+aINXZH904dWw=="],
+
     "@types/babel__core": ["@types/babel__core@7.20.5", "", { "dependencies": { "@babel/parser": "^7.20.7", "@babel/types": "^7.20.7", "@types/babel__generator": "*", "@types/babel__template": "*", "@types/babel__traverse": "*" } }, "sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA=="],
 
     "@types/babel__generator": ["@types/babel__generator@7.27.0", "", { "dependencies": { "@babel/types": "^7.0.0" } }, "sha512-ufFd2Xi92OAVPYsy+P4n7/U7e68fex0+Ee8gSG9KX7eo084CWiQ4sdxktvdl0bOPupXtVJPY19zk6EwWqUQ8lg=="],
@@ -423,6 +441,8 @@
     "@types/babel__template": ["@types/babel__template@7.4.4", "", { "dependencies": { "@babel/parser": "^7.1.0", "@babel/types": "^7.0.0" } }, "sha512-h/NUaSyG5EyxBIp8YRxo4RMe2/qQgvyowRwVMzhYhBCONbW8PUsg4lkFMrhgZhUe5z3L3MiLDuvyJ/CaPa2A8A=="],
 
     "@types/babel__traverse": ["@types/babel__traverse@7.28.0", "", { "dependencies": { "@babel/types": "^7.28.2" } }, "sha512-8PvcXf70gTDZBgt9ptxJ8elBeBjcLOAcOtoO/mPJjtji1+CdGbHgm77om1GrsPxsiE+uXIpNSK64UYaIwQXd4Q=="],
+
+    "@types/geojson": ["@types/geojson@7946.0.16", "", {}, "sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg=="],
 
     "@types/graceful-fs": ["@types/graceful-fs@4.1.9", "", { "dependencies": { "@types/node": "*" } }, "sha512-olP3sd1qOEe5dXTSaFvQG+02VdRXcdytWLAZsAq1PecU8uqQAhkrnbli7DagjtXKW/Bl7YJbUsa8MPcuc8LHEQ=="],
 
@@ -473,6 +493,8 @@
     "aria-hidden": ["aria-hidden@1.2.6", "", { "dependencies": { "tslib": "^2.0.0" } }, "sha512-ik3ZgC9dY/lYVVM++OISsaYDeg1tb0VtP5uL3ouh1koGOaUMDPpbFIei4JkFimWUFPn90sbMNMXQAIVOlnYKJA=="],
 
     "asap": ["asap@2.0.6", "", {}, "sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA=="],
+
+    "await-lock": ["await-lock@2.2.2", "", {}, "sha512-aDczADvlvTGajTDjcjpJMqRkOF6Qdz3YbPZm/PyW6tKPkx2hlYBzxMhEywM/tU72HrVZjgl5VCdRuMlA7pZ8Gw=="],
 
     "babel-jest": ["babel-jest@29.7.0", "", { "dependencies": { "@jest/transform": "^29.7.0", "@types/babel__core": "^7.1.14", "babel-plugin-istanbul": "^6.1.1", "babel-preset-jest": "^29.6.3", "chalk": "^4.0.0", "graceful-fs": "^4.2.9", "slash": "^3.0.0" }, "peerDependencies": { "@babel/core": "^7.8.0" } }, "sha512-BrvGY3xZSwEcCzKvKsCi2GgHqDqsYkOP4/by5xCgIwGXQxIEh+8ew3gmrE1y7XRR6LHZIj6yLYnUi/mm2KXKBg=="],
 
@@ -584,6 +606,8 @@
 
     "csstype": ["csstype@3.2.3", "", {}, "sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ=="],
 
+    "debounce": ["debounce@2.2.0", "", {}, "sha512-Xks6RUDLZFdz8LIdR6q0MTH44k7FikOmnh5xkSjMig6ch45afc8sjTjRQf3P6ax8dMgcQrYO/AR2RGWURrruqw=="],
+
     "debug": ["debug@4.4.3", "", { "dependencies": { "ms": "^2.1.3" } }, "sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA=="],
 
     "decode-uri-component": ["decode-uri-component@0.2.2", "", {}, "sha512-FqUYQ+8o158GyGTrMFJms9qh3CqTKvAqgqsTnkLI8sKu0028orqBhxNMFkFen0zGyg6epACD32pjVk58ngIErQ=="],
@@ -663,6 +687,8 @@
     "expo-server": ["expo-server@55.0.6", "", {}, "sha512-xI72FTm469FfuuBL2R5aNtthgH+GR7ygOpsx/KcPS0K8AZaZd7VjtEExbzn9/qyyYkWW3T+3dAmCDKOMX8gdmQ=="],
 
     "expo-splash-screen": ["expo-splash-screen@55.0.13", "", { "dependencies": { "@expo/prebuild-config": "^55.0.11" }, "peerDependencies": { "expo": "*" } }, "sha512-dEainzjUZbqdmcQjO7tIqoh432jloxOGzHJHErGIMxg1QlahKj0e5D/4CY1Xd6qIOs1rRBlG63mPxx7iGBWbHQ=="],
+
+    "expo-sqlite": ["expo-sqlite@55.0.11", "", { "dependencies": { "await-lock": "^2.2.2" }, "peerDependencies": { "expo": "*", "react": "*", "react-native": "*" } }, "sha512-lDGJrE0m1lw/3y1ZSsER2kfXnS+9WzgaKcIFp/RKbTfyhs0v8l86Ulqdr+6peRFOfzi0kdj4Ty0LzE2Adx93tg=="],
 
     "expo-symbols": ["expo-symbols@55.0.5", "", { "dependencies": { "@expo-google-fonts/material-symbols": "^0.4.1", "sf-symbols-typescript": "^2.0.0" }, "peerDependencies": { "expo": "*", "expo-font": "*", "react": "*", "react-native": "*" } }, "sha512-W/QYRvnYVes947ZYOHtuKL8Gobs7BUjeu9oknzbo4jGnou7Ks6bj1CwdT0ZWNBgaTopbS4/POXumJIkW4cTPSQ=="],
 

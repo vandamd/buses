@@ -5,9 +5,9 @@ import {
   InvertColorsProvider,
   useInvertColors,
 } from "@/contexts/InvertColorsContext";
-import { OptionExampleProvider } from "@/contexts/OptionExampleContext";
+import { SavedStopsProvider } from "@/contexts/SavedStopsContext";
 
-function RootLayout() {
+function RootNavigation() {
   const { invertColors } = useInvertColors();
 
   return (
@@ -19,7 +19,13 @@ function RootLayout() {
           backgroundColor: invertColors ? "white" : "black",
         },
       }}
-    />
+    >
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="search-results" />
+      <Stack.Screen name="bus-stop/[atcoCode]" />
+      <Stack.Screen name="reorder-stops" />
+      <Stack.Screen name="bus-vehicle/[tripId]" />
+    </Stack>
   );
 }
 
@@ -27,10 +33,10 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <InvertColorsProvider>
-        <OptionExampleProvider>
+        <SavedStopsProvider>
           <StatusBar hidden />
-          <RootLayout />
-        </OptionExampleProvider>
+          <RootNavigation />
+        </SavedStopsProvider>
       </InvertColorsProvider>
     </GestureHandlerRootView>
   );

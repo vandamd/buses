@@ -1,27 +1,66 @@
+import { router } from "expo-router";
+import { CenteredMessage } from "@/components/CenteredMessage";
 import ContentContainer from "@/components/ContentContainer";
-import { StyledButton } from "@/components/StyledButton";
+import { ListItem } from "@/components/ListItem";
+import { useSavedStops } from "@/contexts/SavedStopsContext";
+import { useCurrentTime } from "@/hooks/useCurrentTime";
+import { useSavedStopsNextDepartures } from "@/hooks/useSavedStopsNextDepartures";
+import type { SavedStop } from "@/types/stop";
+import { getStopDisplayName, getStopListSecondaryText } from "@/utils/stops";
 
-const buttons = [
-  { id: "1", text: "Test Button long one because I want to test a long button 1" },
-  { id: "2", text: "Test Button 2" },
-  { id: "3", text: "Test Button 3" },
-  { id: "4", text: "Test Button 4" },
-  { id: "5", text: "Test Button 5" },
-  { id: "6", text: "Test Button 6" },
-  { id: "7", text: "Test Button 7" },
-  { id: "8", text: "Test Button 8" },
-  { id: "9", text: "Test Button 9" },
-  { id: "10", text: "Test Button 10" },
-];
+export default function BusStopsTab() {
+  const { savedStops, isLoading } = useSavedStops();
+  const currentTime = useCurrentTime();
+  const nextDepartures = useSavedStopsNextDepartures(savedStops);
+  const containerProps = {
+    contentGap: 8,
+    headerTitle: currentTime,
+    hideBackButton: true,
+    rightAction: {
+      icon: "swap-vert" as const,
+      onPress: () => router.push("/reorder-stops"),
+      show: savedStops.length > 1,
+    },
+  };
 
-export default function Tab() {
+  const handleStopPress = (stop: SavedStop) => {
+    router.push({
+      pathname: "/bus-stop/[atcoCode]",
+      params: {
+        atcoCode: stop.atco_code,
+        stopName: getStopDisplayName(stop),
+        lineNames: stop.line_names.join(","),
+      },
+    });
+  };
+
+  if (isLoading) {
+    return <ContentContainer {...containerProps} />;
+  }
+
+  if (savedStops.length === 0) {
+    return (
+      <ContentContainer {...containerProps}>
+        <CenteredMessage
+          hint="Open the Search tab to add your first stop."
+          message="No saved stops"
+        />
+      </ContentContainer>
+    );
+  }
+
   return (
-    <ContentContainer
-      headerTitle="Liked Songs"
-      hideBackButton
-    >
-      {buttons.map((button) => (
-        <StyledButton key={button.id} text={button.text} />
+    <ContentContainer {...containerProps}>
+      {savedStops.map((item) => (
+        <ListItem
+          key={item.atco_code}
+          onPress={() => handleStopPress(item)}
+          primaryText={getStopDisplayName(item)}
+          secondaryText={getStopListSecondaryText(
+            item,
+            nextDepartures[item.atco_code]
+          )}
+        />
       ))}
     </ContentContainer>
   );

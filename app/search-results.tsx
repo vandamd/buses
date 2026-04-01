@@ -1,18 +1,69 @@
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
+import { CenteredMessage } from "@/components/CenteredMessage";
 import ContentContainer from "@/components/ContentContainer";
-import { StyledButton } from "@/components/StyledButton";
+import { ListItem } from "@/components/ListItem";
+import { useStopSearchResults } from "@/hooks/useStopSearchResults";
+import type { LocalStopResult } from "@/services/localStopSearch";
+import { getStopDisplayName } from "@/utils/stops";
 
 export default function SearchResultsScreen() {
-  const { query } = useLocalSearchParams<{ query: string }>();
+  const { query = "" } = useLocalSearchParams<{ query?: string }>();
+  const { results, isLoading, error, trimmedQuery } =
+    useStopSearchResults(query);
+  const headerTitle = trimmedQuery
+    ? `Results for "${trimmedQuery}"`
+    : "Search Results";
 
-  if (!query) {
-    return <ContentContainer headerTitle=" " />;
+  const handleStopPress = (stop: LocalStopResult) => {
+    router.push({
+      pathname: "/bus-stop/[atcoCode]",
+      params: {
+        atcoCode: stop.atco_code,
+        stopName: getStopDisplayName(stop),
+      },
+    });
+  };
+
+  if (!trimmedQuery) {
+    return (
+      <ContentContainer contentGap={8} headerTitle={headerTitle}>
+        <CenteredMessage
+          hint="Enter a stop name and run a search."
+          message="No search query"
+        />
+      </ContentContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <ContentContainer contentGap={8} headerTitle={headerTitle}>
+        <CenteredMessage message={error.message} />
+      </ContentContainer>
+    );
+  }
+
+  if (isLoading) {
+    return <ContentContainer contentGap={8} headerTitle={headerTitle} />;
+  }
+
+  if (results.length === 0) {
+    return (
+      <ContentContainer contentGap={8} headerTitle={headerTitle}>
+        <CenteredMessage message={`No stops found for "${trimmedQuery}"`} />
+      </ContentContainer>
+    );
   }
 
   return (
-    <ContentContainer headerTitle={`Results for "${query}"`}>
-      {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-        <StyledButton key={num} text={`${query} - Result ${num}`} />
+    <ContentContainer contentGap={8} headerTitle={headerTitle}>
+      {results.map((item) => (
+        <ListItem
+          key={item.atco_code}
+          onPress={() => handleStopPress(item)}
+          primaryText={getStopDisplayName(item)}
+          secondaryText={item.locality}
+        />
       ))}
     </ContentContainer>
   );

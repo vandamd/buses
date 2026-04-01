@@ -79,10 +79,10 @@ To add a new tab:
 1. Create screen file `app/(tabs)/search.tsx`
 2. Add to `TABS_CONFIG` in `app/(tabs)/_layout.tsx`:
 ```tsx
-export const TABS_CONFIG: ReadonlyArray<TabConfigItem> = [
-  { name: "Home", screenName: "index", iconName: "home" },
-  { name: "Search", screenName: "search", iconName: "search" },  // new
-  { name: "Settings", screenName: "settings", iconName: "settings" },
+export const TABS_CONFIG: readonly TabConfigItem[] = [
+  { screenName: "index", iconName: "directions-bus" },
+  { screenName: "search", iconName: "search" },
+  { screenName: "settings", iconName: "settings" },
 ] as const;
 ```
 3. Add `<Tabs.Screen>` entry:
@@ -94,59 +94,13 @@ export const TABS_CONFIG: ReadonlyArray<TabConfigItem> = [
 
 Icons: Use [MaterialIcons](https://icons.expo.fyi/Index) names.
 
-## Settings Pattern
-Settings use nested routes:
-```
-app/(tabs)/settings.tsx         → Main settings page
-app/settings/customise.tsx      → Customise options
-app/settings/option-example.tsx → Options page (example)
-```
-
-Use `SelectorButton` + `OptionsSelector` for option pickers:
-```tsx
-// In settings page
-<SelectorButton
-    label="Option Example"
-    value={currentValue}
-    href="/settings/option-example"
-/>
-
-// In options page (app/settings/option-example.tsx)
-<OptionsSelector
-    title="Option Example"
-    options={[{ label: "Standard", value: "standard" }, ...]}
-    selectedValue={optionValue}
-    onSelect={(value) => setOptionValue(value)}
-/>
-```
-
-## Confirmation Screen
-For destructive actions, use the confirm screen pattern:
-```tsx
-router.push({
-    pathname: "/confirm",
-    params: {
-        title: "Clear Cache",
-        message: "Are you sure?",
-        confirmText: "Clear",
-        action: "clearCache",
-        returnPath: "/(tabs)/settings",
-    },
-});
-
-// Handle confirmation in useEffect
-useEffect(() => {
-    if (params.confirmed === "true" && params.action === "clearCache") {
-        router.setParams({ confirmed: undefined, action: undefined });
-        // Do the action
-    }
-}, [params.confirmed, params.action]);
-```
+## Settings
+`app/(tabs)/settings.tsx` is a normal `ContentContainer` screen. Prefer simple toggles or list rows before introducing new settings-specific abstractions.
 
 ## Contexts
 Wrapped in `app/_layout.tsx`:
 - `InvertColorsContext` - Theme toggle (black/white), persists to AsyncStorage
-- `OptionExampleContext` - Example setting context (see `app/settings/option-example.tsx`)
+- `SavedStopsContext` - Stores the user’s saved bus stops
 
 Use: `const { invertColors } = useInvertColors();`
 

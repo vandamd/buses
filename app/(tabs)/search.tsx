@@ -7,10 +7,12 @@ export default function SearchScreen() {
   const [query, setQuery] = useState("");
 
   const handleSearch = () => {
-    if (query.length > 0) {
+    const trimmedQuery = query.trim();
+
+    if (trimmedQuery.length > 0) {
       router.push({
         pathname: "/search-results",
-        params: { query },
+        params: { query: trimmedQuery },
       });
     }
   };
@@ -22,14 +24,13 @@ export default function SearchScreen() {
       rightAction={{
         icon: "search",
         onPress: handleSearch,
-        show: query.length > 0,
+        show: query.trim().length > 0,
       }}
     >
       <TextInput
-        autoFocus
         onChangeText={setQuery}
         onSubmit={handleSearch}
-        placeholder="Search..."
+        placeholder="Search for a stop"
         value={query}
       />
     </ContentContainer>

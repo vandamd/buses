@@ -1,27 +1,28 @@
 {
   "expo": {
-    "name": "appname",
-    "slug": "appname",
+    "name": "Buses",
+    "slug": "buses",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "appname",
+    "scheme": "buses",
     "icon": "./assets/images/icon.png",
     "android": {
       "backgroundColor": "#000000",
-      "package": "com.vandam.appname"
+      "package": "com.vandam.buses"
     },
     "plugins": [
       "expo-router",
       [
         "expo-font",
         {
-          "fonts": [
-            "./assets/fonts/PublicSans-Regular.ttf"
-          ]
+          "fonts": ["./assets/fonts/PublicSans-Regular.ttf"]
         }
       ],
       "./plugins/withAndroidConfigChanges",
-      "./plugins/withAndroidTheme"
+      "./plugins/withAndroidTheme",
+      "expo-asset",
+      "expo-sqlite",
+      "@maplibre/maplibre-react-native"
     ],
     "experiments": {
       "typedRoutes": true
