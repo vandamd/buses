@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useFocusedPolling } from "@/hooks/useFocusedPolling";
 import {
   type Departure,
   getStop,
@@ -14,18 +15,24 @@ export function useStopDetails(atcoCode?: string) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchDepartures = useCallback(async () => {
-    if (!atcoCode) {
-      return;
-    }
+  const fetchDepartures = useCallback(
+    async (isActive: () => boolean) => {
+      if (!atcoCode) {
+        return;
+      }
 
-    try {
-      const data = await getStopDepartures(atcoCode);
-      setDepartures(data);
-    } catch {
-      // Departures are supplementary, so keep the screen usable.
-    }
-  }, [atcoCode]);
+      try {
+        const data = await getStopDepartures(atcoCode);
+        if (!isActive()) {
+          return;
+        }
+        setDepartures(data);
+      } catch {
+        // Departures are supplementary, so keep the screen usable.
+      }
+    },
+    [atcoCode]
+  );
 
   useEffect(() => {
     let isActive = true;
@@ -71,17 +78,10 @@ export function useStopDetails(atcoCode?: string) {
     };
   }, [atcoCode]);
 
-  useEffect(() => {
-    if (!atcoCode || isLoading) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      fetchDepartures().catch(() => undefined);
-    }, REFRESH_INTERVAL_MS);
-
-    return () => clearInterval(interval);
-  }, [atcoCode, fetchDepartures, isLoading]);
+  useFocusedPolling(fetchDepartures, {
+    enabled: Boolean(atcoCode) && !isLoading,
+    intervalMs: REFRESH_INTERVAL_MS,
+  });
 
   return {
     departures,

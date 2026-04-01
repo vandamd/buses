@@ -12,7 +12,6 @@ import { useSavedStops } from "@/contexts/SavedStopsContext";
 import { useCurrentTime } from "@/hooks/useCurrentTime";
 import { useStopDetails } from "@/hooks/useStopDetails";
 import type { Departure } from "@/services/api/bus-stops";
-import { decodeHtmlEntities } from "@/utils/decodeHtml";
 import { n } from "@/utils/scaling";
 import { getStopDisplayName, parseLineNamesParam } from "@/utils/stops";
 
@@ -93,7 +92,7 @@ function TimetableRow({
   const tripId = departure.tripId;
   const canTrack = tripId !== null;
   const textStyle: StyleProp<TextStyle> = canTrack ? undefined : styles.dimmed;
-  const destinationText = decodeHtmlEntities(departure.destination);
+  const destinationText = departure.destination;
 
   const handlePress = () => {
     if (tripId === null) {

@@ -7,8 +7,7 @@
 1. Run `bun install`
 2. Add any runtime keys you want to use:
    - `EXPO_PUBLIC_MAPTILER_KEY` for vehicle maps
-   - `EXPO_PUBLIC_FIRST_BUS_API_KEY` for First Bus occupancy enrichment
-   - `EXPO_PUBLIC_BODS_API_KEY` for BODS occupancy enrichment
+   - `EXPO_PUBLIC_FIRST_BUS_API_KEY` for First Bus seat enrichment
 3. Run `bun dev`
 
 ## Commands

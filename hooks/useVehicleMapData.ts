@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useFocusedPolling } from "@/hooks/useFocusedPolling";
 import {
   getAllVehicles,
   getTripData,
@@ -60,14 +61,31 @@ export function useVehicleMapData({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchVehicles = useCallback(async (serviceId: number) => {
-    try {
-      const data = await getAllVehicles(serviceId);
-      setAllVehicles(data);
-    } catch {
-      // Live vehicle positions are nice-to-have; keep the route visible.
-    }
-  }, []);
+  const fetchVehicles = useCallback(
+    async (serviceId: number, isActive: () => boolean) => {
+      try {
+        const data = await getAllVehicles(serviceId);
+        if (!isActive()) {
+          return;
+        }
+        setAllVehicles(data);
+      } catch {
+        // Live vehicle positions are nice-to-have; keep the route visible.
+      }
+    },
+    []
+  );
+
+  const refreshVehicles = useCallback(
+    async (isActive: () => boolean) => {
+      if (!tripData?.serviceId) {
+        return;
+      }
+
+      await fetchVehicles(tripData.serviceId, isActive);
+    },
+    [fetchVehicles, tripData?.serviceId]
+  );
 
   useEffect(() => {
     let isActive = true;
@@ -112,17 +130,10 @@ export function useVehicleMapData({
     };
   }, [mapEnabled, tripId]);
 
-  useEffect(() => {
-    if (!tripData?.serviceId) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      fetchVehicles(tripData.serviceId).catch(() => undefined);
-    }, REFRESH_INTERVAL_MS);
-
-    return () => clearInterval(interval);
-  }, [fetchVehicles, tripData?.serviceId]);
+  useFocusedPolling(refreshVehicles, {
+    enabled: Boolean(tripData?.serviceId),
+    intervalMs: REFRESH_INTERVAL_MS,
+  });
 
   const routeGeoJson = useMemo(() => buildRouteGeoJson(tripData), [tripData]);
   const stopsGeoJson = useMemo(
