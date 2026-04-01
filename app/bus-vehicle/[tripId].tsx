@@ -130,6 +130,7 @@ function VehicleMapShell({
   title: string;
 }) {
   const { invertColors } = useInvertColors();
+  const backgroundColor = invertColors ? "white" : "black";
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -139,12 +140,7 @@ function VehicleMapShell({
 
   return (
     <SwipeBackContainer enabled onSwipeBack={handleBack}>
-      <View
-        style={[
-          styles.screen,
-          { backgroundColor: invertColors ? "white" : "black" },
-        ]}
-      >
+      <View style={[styles.screen, { backgroundColor }]}>
         <Header headerTitle={title} />
         {children ?? <View style={styles.fill} />}
       </View>
@@ -295,7 +291,7 @@ export default function VehicleMapScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    gap: n(10)
+    gap: n(10),
   },
   fill: {
     flex: 1,

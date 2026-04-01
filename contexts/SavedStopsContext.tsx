@@ -33,6 +33,46 @@ const SavedStopsContext = createContext<SavedStopsContextType>({
 
 export const useSavedStops = () => useContext(SavedStopsContext);
 
+function createSavedStop(stop: BusStop): SavedStop {
+  return {
+    atco_code: stop.atco_code,
+    common_name: stop.common_name,
+    indicator: stop.indicator,
+    line_names: stop.line_names || [],
+    location: stop.location,
+    saved_at: new Date().toISOString(),
+  };
+}
+
+function moveSavedStop(
+  savedStops: SavedStop[],
+  atcoCode: string,
+  direction: "up" | "down"
+) {
+  const currentIndex = savedStops.findIndex(
+    (stop) => stop.atco_code === atcoCode
+  );
+
+  if (currentIndex === -1) {
+    return savedStops;
+  }
+
+  if (direction === "up" && currentIndex === 0) {
+    return savedStops;
+  }
+
+  if (direction === "down" && currentIndex === savedStops.length - 1) {
+    return savedStops;
+  }
+
+  const nextIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+  const updatedStops = [...savedStops];
+  const [savedStop] = updatedStops.splice(currentIndex, 1);
+
+  updatedStops.splice(nextIndex, 0, savedStop);
+  return updatedStops;
+}
+
 export const SavedStopsProvider = ({ children }: { children: ReactNode }) => {
   const [savedStops, setSavedStops] = useState<SavedStop[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,38 +90,46 @@ export const SavedStopsProvider = ({ children }: { children: ReactNode }) => {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(stops));
   }, []);
 
-  const addStop = useCallback(
-    (stop: BusStop) => {
-      const newSavedStop: SavedStop = {
-        atco_code: stop.atco_code,
-        common_name: stop.common_name,
-        indicator: stop.indicator,
-        line_names: stop.line_names || [],
-        location: stop.location,
-        saved_at: new Date().toISOString(),
-      };
+  const updateSavedStops = useCallback(
+    (updater: (current: SavedStop[]) => SavedStop[]) => {
+      setSavedStops((current) => {
+        const updatedStops = updater(current);
 
-      setSavedStops((prev) => {
-        if (prev.some((s) => s.atco_code === stop.atco_code)) {
-          return prev;
+        if (updatedStops !== current) {
+          persistStops(updatedStops);
         }
-        const updated = [newSavedStop, ...prev];
-        persistStops(updated);
-        return updated;
+
+        return updatedStops;
       });
     },
     [persistStops]
   );
 
-  const removeStop = useCallback(
-    (atcoCode: string) => {
-      setSavedStops((prev) => {
-        const updated = prev.filter((s) => s.atco_code !== atcoCode);
-        persistStops(updated);
-        return updated;
+  const addStop = useCallback(
+    (stop: BusStop) => {
+      const savedStop = createSavedStop(stop);
+
+      updateSavedStops((current) => {
+        if (current.some((item) => item.atco_code === stop.atco_code)) {
+          return current;
+        }
+
+        return [savedStop, ...current];
       });
     },
-    [persistStops]
+    [updateSavedStops]
+  );
+
+  const removeStop = useCallback(
+    (atcoCode: string) => {
+      updateSavedStops((current) => {
+        const updatedStops = current.filter(
+          (stop) => stop.atco_code !== atcoCode
+        );
+        return updatedStops.length === current.length ? current : updatedStops;
+      });
+    },
+    [updateSavedStops]
   );
 
   const isStopSaved = useCallback(
@@ -93,28 +141,11 @@ export const SavedStopsProvider = ({ children }: { children: ReactNode }) => {
 
   const reorderStop = useCallback(
     (atcoCode: string, direction: "up" | "down") => {
-      setSavedStops((prev) => {
-        const currentIndex = prev.findIndex((s) => s.atco_code === atcoCode);
-        if (currentIndex === -1) {
-          return prev;
-        }
-        if (direction === "up" && currentIndex === 0) {
-          return prev;
-        }
-        if (direction === "down" && currentIndex === prev.length - 1) {
-          return prev;
-        }
-
-        const newIndex =
-          direction === "up" ? currentIndex - 1 : currentIndex + 1;
-        const updated = [...prev];
-        const [item] = updated.splice(currentIndex, 1);
-        updated.splice(newIndex, 0, item);
-        persistStops(updated);
-        return updated;
-      });
+      updateSavedStops((current) =>
+        moveSavedStop(current, atcoCode, direction)
+      );
     },
-    [persistStops]
+    [updateSavedStops]
   );
 
   const value = useMemo(

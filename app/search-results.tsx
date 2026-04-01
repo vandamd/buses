@@ -4,7 +4,7 @@ import ContentContainer from "@/components/ContentContainer";
 import { ListItem } from "@/components/ListItem";
 import { useStopSearchResults } from "@/hooks/useStopSearchResults";
 import type { LocalStopResult } from "@/services/localStopSearch";
-import { getStopDisplayName } from "@/utils/stops";
+import { getStopDisplayName, getStopRouteParams } from "@/utils/stops";
 
 export default function SearchResultsScreen() {
   const { query = "" } = useLocalSearchParams<{ query?: string }>();
@@ -17,10 +17,7 @@ export default function SearchResultsScreen() {
   const handleStopPress = (stop: LocalStopResult) => {
     router.push({
       pathname: "/bus-stop/[atcoCode]",
-      params: {
-        atcoCode: stop.atco_code,
-        stopName: getStopDisplayName(stop),
-      },
+      params: getStopRouteParams(stop),
     });
   };
 

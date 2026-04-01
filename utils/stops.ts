@@ -11,10 +11,32 @@ interface StopRoutesLike {
   line_names?: string[] | null;
 }
 
+interface StopRouteLike extends StopNameLike, StopRoutesLike {
+  atco_code: string;
+}
+
+function getLineNames(lineNames?: string[] | null): string[] {
+  return lineNames?.filter((lineName) => lineName.length > 0) ?? [];
+}
+
 export function getStopDisplayName(stop: StopNameLike): string {
   return stop.indicator
     ? `${stop.common_name} (${stop.indicator})`
     : stop.common_name;
+}
+
+export function getStopRouteParams(stop: StopRouteLike) {
+  const lineNames = getLineNames(stop.line_names);
+
+  return {
+    atcoCode: stop.atco_code,
+    stopName: getStopDisplayName(stop),
+    ...(lineNames.length > 0 ? { lineNames: lineNames.join(",") } : {}),
+  };
+}
+
+export function parseLineNamesParam(lineNames?: string): string[] {
+  return getLineNames(lineNames?.split(","));
 }
 
 export function getStopListSecondaryText(

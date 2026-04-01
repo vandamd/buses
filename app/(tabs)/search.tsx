@@ -5,10 +5,9 @@ import { TextInput } from "@/components/TextInput";
 
 export default function SearchScreen() {
   const [query, setQuery] = useState("");
+  const trimmedQuery = query.trim();
 
   const handleSearch = () => {
-    const trimmedQuery = query.trim();
-
     if (trimmedQuery.length > 0) {
       router.push({
         pathname: "/search-results",
@@ -24,7 +23,7 @@ export default function SearchScreen() {
       rightAction={{
         icon: "search",
         onPress: handleSearch,
-        show: query.trim().length > 0,
+        show: trimmedQuery.length > 0,
       }}
     >
       <TextInput

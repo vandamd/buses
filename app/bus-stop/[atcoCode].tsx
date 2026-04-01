@@ -14,11 +14,24 @@ import { useStopDetails } from "@/hooks/useStopDetails";
 import type { Departure } from "@/services/api/bus-stops";
 import { decodeHtmlEntities } from "@/utils/decodeHtml";
 import { n } from "@/utils/scaling";
-import { getStopDisplayName } from "@/utils/stops";
+import { getStopDisplayName, parseLineNamesParam } from "@/utils/stops";
 
 interface DetailSectionProps {
   children: ReactNode;
   title: string;
+}
+
+interface TimetableRowProps {
+  departure: Departure;
+  isServiceWidthReady: boolean;
+  onMeasureServiceWidth: (service: string, width: number) => void;
+  serviceWidth?: number;
+  stopAtcoCode: string;
+}
+
+interface TimetableSectionProps {
+  atcoCode: string;
+  departures: Departure[];
 }
 
 function DetailSection({ title, children }: DetailSectionProps) {
@@ -59,44 +72,44 @@ function getDepartureKey(departure: Departure): string {
   ].join("-");
 }
 
+function getDepartureMetaText(departure: Departure): string {
+  const metaParts = [departure.scheduled];
+
+  if (departure.expected && departure.expected !== departure.scheduled) {
+    metaParts.push(`Expected ${departure.expected}`);
+  }
+
+  return metaParts.join(" · ");
+}
+
 function TimetableRow({
   departure,
   isServiceWidthReady,
   onMeasureServiceWidth,
   serviceWidth,
   stopAtcoCode,
-}: {
-  departure: Departure;
-  isServiceWidthReady: boolean;
-  onMeasureServiceWidth: (service: string, width: number) => void;
-  serviceWidth?: number;
-  stopAtcoCode: string;
-}) {
+}: TimetableRowProps) {
   const { invertColors } = useInvertColors();
-  const canTrack = departure.tripId !== null;
+  const tripId = departure.tripId;
+  const canTrack = tripId !== null;
   const textStyle: StyleProp<TextStyle> = canTrack ? undefined : styles.dimmed;
+  const destinationText = decodeHtmlEntities(departure.destination);
 
   const handlePress = () => {
-    if (departure.tripId === null) {
+    if (tripId === null) {
       return;
     }
 
     router.push({
       pathname: "/bus-vehicle/[tripId]",
       params: {
-        tripId: departure.tripId.toString(),
+        tripId: tripId.toString(),
         service: departure.service,
-        destination: decodeHtmlEntities(departure.destination),
+        destination: destinationText,
         stopAtcoCode,
       },
     });
   };
-
-  const metaParts: string[] = [departure.scheduled];
-
-  if (departure.expected && departure.expected !== departure.scheduled) {
-    metaParts.push(`Expected ${departure.expected}`);
-  }
 
   const seatInfo =
     departure.availableSeats === undefined ? null : (
@@ -111,8 +124,6 @@ function TimetableRow({
         </StyledText>
       </View>
     );
-
-  const destinationText = decodeHtmlEntities(departure.destination);
 
   return (
     <HapticPressable
@@ -152,7 +163,7 @@ function TimetableRow({
         </StyledText>
         <View style={styles.departureMetaRow}>
           <StyledText style={[styles.departureMetaText, textStyle]}>
-            {metaParts.join(" · ")}
+            {getDepartureMetaText(departure)}
           </StyledText>
           {seatInfo}
         </View>
@@ -161,13 +172,7 @@ function TimetableRow({
   );
 }
 
-function TimetableSection({
-  atcoCode,
-  departures,
-}: {
-  atcoCode: string;
-  departures: Departure[];
-}) {
+function TimetableSection({ atcoCode, departures }: TimetableSectionProps) {
   const [serviceWidths, setServiceWidths] = useState<Record<string, number>>(
     {}
   );
@@ -243,7 +248,7 @@ export default function StopDetailScreen() {
   const { stop, departures, isLoading, error } = useStopDetails(atcoCode);
 
   const isSaved = stop ? isStopSaved(stop.atco_code) : false;
-  const fallbackRoutes = passedLineNames?.split(",").filter(Boolean) ?? [];
+  const fallbackRoutes = parseLineNamesParam(passedLineNames);
 
   const handleToggleSave = () => {
     if (!stop) {
@@ -256,7 +261,7 @@ export default function StopDetailScreen() {
     addStop(stop);
   };
 
-  const stopName = stop ? getStopDisplayName(stop) : passedStopName || "Stop";
+  const stopName = stop ? getStopDisplayName(stop) : (passedStopName ?? "Stop");
   const routes = stop?.line_names ?? fallbackRoutes;
 
   if (isLoading) {

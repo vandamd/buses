@@ -36,6 +36,13 @@ export default function ContentContainer({
   } = useScrollIndicator();
 
   const canSwipeBack = Boolean(headerTitle) && !hideBackButton;
+  const backgroundColor = invertColors ? "white" : "black";
+  const contentWidthStyle =
+    contentWidth === "wide" ? styles.contentWide : styles.contentNormal;
+  const scrollIndicatorPositionStyle =
+    contentWidth === "wide"
+      ? styles.scrollIndicatorWide
+      : styles.scrollIndicatorNormal;
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -45,12 +52,7 @@ export default function ContentContainer({
 
   return (
     <SwipeBackContainer enabled={canSwipeBack} onSwipeBack={handleBack}>
-      <View
-        style={[
-          styles.container,
-          { backgroundColor: invertColors ? "white" : "black" },
-        ]}
-      >
+      <View style={[styles.container, { backgroundColor }]}>
         {headerTitle && (
           <Header
             headerTitle={headerTitle}
@@ -61,7 +63,7 @@ export default function ContentContainer({
         <View
           style={[
             styles.scrollWrapper,
-            { paddingBottom: hasNavbar ? undefined : n(20) },
+            !hasNavbar && styles.scrollWrapperWithoutNavbar,
           ]}
         >
           <Animated.ScrollView
@@ -79,11 +81,8 @@ export default function ContentContainer({
               }
               style={[
                 styles.content,
-                {
-                  gap: n(contentGap),
-                  paddingLeft: contentWidth === "wide" ? n(20) : n(37),
-                  paddingRight: contentWidth === "wide" ? n(32) : n(46),
-                },
+                contentWidthStyle,
+                { gap: n(contentGap) },
               ]}
             >
               {children ?? null}
@@ -93,10 +92,8 @@ export default function ContentContainer({
             <View
               style={[
                 styles.scrollIndicatorTrack,
-                {
-                  right: contentWidth === "wide" ? n(18) : n(34),
-                  backgroundColor: invertColors ? "black" : "white",
-                },
+                scrollIndicatorPositionStyle,
+                { backgroundColor: invertColors ? "black" : "white" },
               ]}
             >
               <Animated.View
@@ -135,17 +132,33 @@ const styles = StyleSheet.create({
     width: "100%",
     position: "relative",
   },
+  scrollWrapperWithoutNavbar: {
+    paddingBottom: n(20),
+  },
   content: {
     flexGrow: 1,
     justifyContent: "flex-start",
     alignItems: "flex-start",
-    paddingHorizontal: n(37),
     gap: n(47),
+  },
+  contentNormal: {
+    paddingLeft: n(37),
+    paddingRight: n(46),
+  },
+  contentWide: {
+    paddingLeft: n(20),
+    paddingRight: n(32),
   },
   scrollIndicatorTrack: {
     width: n(1),
     height: "100%",
     position: "absolute",
+  },
+  scrollIndicatorNormal: {
+    right: n(34),
+  },
+  scrollIndicatorWide: {
+    right: n(18),
   },
   scrollIndicatorThumb: {
     width: n(5),

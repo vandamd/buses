@@ -6,7 +6,11 @@ import { useSavedStops } from "@/contexts/SavedStopsContext";
 import { useCurrentTime } from "@/hooks/useCurrentTime";
 import { useSavedStopsNextDepartures } from "@/hooks/useSavedStopsNextDepartures";
 import type { SavedStop } from "@/types/stop";
-import { getStopDisplayName, getStopListSecondaryText } from "@/utils/stops";
+import {
+  getStopDisplayName,
+  getStopListSecondaryText,
+  getStopRouteParams,
+} from "@/utils/stops";
 
 export default function BusStopsTab() {
   const { savedStops, isLoading } = useSavedStops();
@@ -26,11 +30,7 @@ export default function BusStopsTab() {
   const handleStopPress = (stop: SavedStop) => {
     router.push({
       pathname: "/bus-stop/[atcoCode]",
-      params: {
-        atcoCode: stop.atco_code,
-        stopName: getStopDisplayName(stop),
-        lineNames: stop.line_names.join(","),
-      },
+      params: getStopRouteParams(stop),
     });
   };
 
