@@ -276,7 +276,7 @@ export default function StopDetailScreen() {
   if (isLoading) {
     return (
       <ContentContainer headerTitle={currentTime}>
-        <CenteredMessage message={"Loading..."} />
+        <DetailSection title="Loading..."> </DetailSection>
       </ContentContainer>
     );
   }
