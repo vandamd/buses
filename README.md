@@ -2,7 +2,7 @@
 
 <p>An app for the Light Phone III to track buses in the UK</p>
 
-![GitHub License](https://img.shields.io/github/license/vandamd/buses?)
+![GitHub License](https://img.shields.io/github/license/vandamd/buses)
 ![GitHub Release](https://img.shields.io/github/v/release/vandamd/buses?)
 
 ## Installation
