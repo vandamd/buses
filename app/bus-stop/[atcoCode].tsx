@@ -264,7 +264,11 @@ export default function StopDetailScreen() {
   const routes = stop?.line_names ?? fallbackRoutes;
 
   if (isLoading) {
-    return <ContentContainer headerTitle={currentTime} />;
+    return (
+        <ContentContainer headerTitle={currentTime}>
+          <CenteredMessage message={"Loading..."} />
+        </ContentContainer>
+    );
   }
 
   if (error || !stop) {

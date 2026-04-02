@@ -1,17 +1,17 @@
 import {
   Camera,
   CircleLayer,
+  type Expression,
   Images,
   LineLayer,
   MapView,
   ShapeSource,
   SymbolLayer,
+  type SymbolLayerStyle,
 } from "@maplibre/maplibre-react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import type { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
-import darkMatterStyle from "@/assets/maps/dark_matter.json";
-import positronStyle from "@/assets/maps/positron.json";
 import { CenteredMessage } from "@/components/CenteredMessage";
 import { Header } from "@/components/Header";
 import { SwipeBackContainer } from "@/components/SwipeBackContainer";
@@ -19,7 +19,6 @@ import { useInvertColors } from "@/contexts/InvertColorsContext";
 import { useVehicleMapData } from "@/hooks/useVehicleMapData";
 import { n } from "@/utils/scaling";
 
-const MAPTILER_KEY = process.env.EXPO_PUBLIC_MAPTILER_KEY || "";
 const MAP_CAMERA_PADDING = {
   paddingTop: n(20),
   paddingBottom: n(20),
@@ -37,13 +36,34 @@ type StopsGeoJson = NonNullable<VehicleMapData["stopsGeoJson"]>;
 type VehiclesGeoJson = NonNullable<VehicleMapData["vehiclesGeoJson"]>;
 type InitialBounds = NonNullable<VehicleMapData["initialBounds"]>;
 
-function injectMapTilerKey(style: unknown) {
-  const json = JSON.stringify(style);
-  return JSON.parse(json.replace(/MAPTILER_KEY/g, MAPTILER_KEY));
-}
-
-const MAP_STYLE_DARK = injectMapTilerKey(darkMatterStyle);
-const MAP_STYLE_LIGHT = injectMapTilerKey(positronStyle);
+const MAP_STYLE_DARK = "https://tiles.openfreemap.org/styles/dark";
+const MAP_STYLE_LIGHT = "https://tiles.openfreemap.org/styles/positron";
+const STOP_LABEL_TEXT_ANCHOR = [
+  "case",
+  ["get", "isCurrent"],
+  "left",
+  "center",
+] as const satisfies Expression;
+const STOP_LABEL_TEXT_FIELD = ["get", "eta"] as const satisfies Expression;
+const STOP_LABEL_TEXT_OFFSET = [
+  "case",
+  ["get", "isCurrent"],
+  ["literal", [0.8, 0]],
+  ["literal", [0, 0]],
+] as const satisfies Expression;
+const STOP_LABEL_FONT = ["Noto Sans Regular"];
+const VEHICLE_SYMBOL_OPACITY = [
+  "case",
+  ["get", "isCurrent"],
+  1,
+  0.4,
+] as const satisfies Expression;
+const VEHICLE_ROTATION = ["get", "heading"] as const satisfies Expression;
+const VEHICLE_LABEL_TEXT_FIELD = [
+  "get",
+  "service",
+] as const satisfies Expression;
+const VEHICLE_LABEL_FONT = ["Noto Sans Regular"];
 
 function getRouteLineStyle(invertColors: boolean) {
   return {
@@ -62,6 +82,15 @@ function getCurrentStopOuterStyle() {
   } as const;
 }
 
+function getStopBaseStyle(invertColors: boolean) {
+  return {
+    circleColor: invertColors
+      ? "rgba(0, 0, 0, 0.28)"
+      : "rgba(255, 255, 255, 0.32)",
+    circleRadius: ["case", ["get", "isCurrent"], n(5), n(3)],
+  } as const;
+}
+
 function getCurrentStopMiddleStyle() {
   return {
     circleColor: "#ffffff",
@@ -76,21 +105,17 @@ function getCurrentStopInnerStyle() {
   } as const;
 }
 
-function getStopLabelStyle(invertColors: boolean) {
+function getStopLabelStyle(invertColors: boolean): SymbolLayerStyle {
   return {
-    textAnchor: ["case", ["get", "isCurrent"], "left", "center"],
+    textAnchor: STOP_LABEL_TEXT_ANCHOR,
     textColor: invertColors ? "#000000" : "#ffffff",
-    textField: ["get", "eta"],
+    textField: STOP_LABEL_TEXT_FIELD,
+    textFont: STOP_LABEL_FONT,
     textHaloColor: invertColors ? "#ffffff" : "#000000",
     textHaloWidth: n(1),
-    textOffset: [
-      "case",
-      ["get", "isCurrent"],
-      ["literal", [0.8, 0]],
-      ["literal", [0, 0]],
-    ],
+    textOffset: STOP_LABEL_TEXT_OFFSET,
     textSize: n(14),
-  } as const;
+  };
 }
 
 function getVehicleIconStyle() {
@@ -99,27 +124,27 @@ function getVehicleIconStyle() {
     iconAnchor: "center",
     iconIgnorePlacement: true,
     iconImage: "busMarker",
-    iconOpacity: ["case", ["get", "isCurrent"], 1, 0.4],
-    iconRotate: ["get", "heading"],
+    iconOpacity: VEHICLE_SYMBOL_OPACITY,
+    iconRotate: VEHICLE_ROTATION,
     iconRotationAlignment: "map",
     iconSize: 0.18,
   } as const;
 }
 
-function getVehicleLabelStyle() {
+function getVehicleLabelStyle(): SymbolLayerStyle {
   return {
     textAllowOverlap: true,
     textAnchor: "center",
     textColor: "black",
-    textField: ["get", "service"],
-    textFont: ["literal", ["Noto Sans Regular"]],
+    textField: VEHICLE_LABEL_TEXT_FIELD,
+    textFont: VEHICLE_LABEL_FONT,
     textIgnorePlacement: true,
     textOffset: [0, 0],
-    textOpacity: ["case", ["get", "isCurrent"], 1, 0.4],
-    textRotate: ["get", "heading"],
+    textOpacity: VEHICLE_SYMBOL_OPACITY,
+    textRotate: VEHICLE_ROTATION,
     textRotationAlignment: "map",
     textSize: n(10),
-  } as const;
+  };
 }
 
 function VehicleMapShell({
@@ -171,6 +196,10 @@ function StopsLayer({
 }) {
   return (
     <ShapeSource id="stops-source" shape={stopsGeoJson}>
+      <CircleLayer
+        id="stops-circles-base"
+        style={getStopBaseStyle(invertColors)}
+      />
       <CircleLayer
         id="stops-circles-outer"
         style={getCurrentStopOuterStyle()}
@@ -254,7 +283,6 @@ export default function VehicleMapScreen() {
     isLoading,
     error,
   } = useVehicleMapData({
-    mapEnabled: Boolean(MAPTILER_KEY),
     stopAtcoCode,
     tripId,
   });

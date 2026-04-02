@@ -16,7 +16,6 @@ import {
 const REFRESH_INTERVAL_MS = 10_000;
 
 interface UseVehicleMapDataParams {
-  mapEnabled: boolean;
   stopAtcoCode?: string;
   tripId?: string;
 }
@@ -54,7 +53,6 @@ async function loadVehicleMapData(tripId: string) {
 export function useVehicleMapData({
   tripId,
   stopAtcoCode,
-  mapEnabled,
 }: UseVehicleMapDataParams) {
   const [tripData, setTripData] = useState<TripData | null>(null);
   const [allVehicles, setAllVehicles] = useState<VehicleLocation[]>([]);
@@ -100,16 +98,6 @@ export function useVehicleMapData({
       };
     }
 
-    if (!mapEnabled) {
-      setTripData(null);
-      setAllVehicles([]);
-      setError("Add EXPO_PUBLIC_MAPTILER_KEY to enable vehicle maps.");
-      setIsLoading(false);
-      return () => {
-        isActive = false;
-      };
-    }
-
     setIsLoading(true);
 
     loadVehicleMapData(tripId)
@@ -128,7 +116,7 @@ export function useVehicleMapData({
     return () => {
       isActive = false;
     };
-  }, [mapEnabled, tripId]);
+  }, [tripId]);
 
   useFocusedPolling(refreshVehicles, {
     enabled: Boolean(tripData?.serviceId),

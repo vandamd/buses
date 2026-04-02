@@ -1,33 +1,25 @@
-<img src="assets/images/example.png" alt="Buses app screenshots">
+<img src="assets/images/example.png" alt="Buses screenshots">
 
-<p>A bus-only Expo app built on the LightOS-style template.</p>
+<p>An app for the Light Phone III for tracking buses in the UK</p>
 
-## Quick Start
+![GitHub License](https://img.shields.io/github/license/vandamd/buses)
+![GitHub Release](https://img.shields.io/github/v/release/vandamd/buses)
 
-1. Run `bun install`
-2. Add any runtime keys you want to use:
-   - `EXPO_PUBLIC_MAPTILER_KEY` for vehicle maps
-   - `EXPO_PUBLIC_FIRST_BUS_API_KEY` for First Bus seat enrichment
-3. Run `bun dev`
+## Installation
 
-## Commands
+The latest APK is available in [Releases](https://github.com/vandamd/buses/releases/latest).
 
-```bash
-bun dev                      # Build and run
-bun run sync-version         # Sync version across files
-bun run generate-icon        # Generate icon from app name
-bun run generate-readme-image  # Generate README example image
-bun run build-stops-db       # Rebuild bundled local stop search database
-```
+I recommend using [Obtainium](https://github.com/ImranR98/Obtainium) and adding the repository URL to receive updates automatically.
 
-## Search Data
+## Features
 
-The app bundles `assets/data/stops.db` so stop search works quickly offline-first. Rebuild it from NaPTAN with `bun run build-stops-db` when you want to refresh the dataset.
+- Bookmark your bus stops
+- See services and live timetable
+- Live map of buses
+- Display seat capacity when available
 
-## Maps And Live Data
+## Support
 
-Stop details, browsing, and vehicle tracking use live bustimes data. Vehicle maps require `EXPO_PUBLIC_MAPTILER_KEY`; if it is missing, the tracking screen shows a clear setup message instead of a blank map.
+Buses is developed and maintained in my free time.
 
-## Detailed Docs
-
-See [AGENTS.md](./AGENTS.md) for complete component reference, patterns, and examples.
+If you find it useful, please [consider sponsoring](https://github.com/sponsors/vandamd). :))

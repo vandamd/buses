@@ -1,3 +1,4 @@
+import { Logger } from "@maplibre/maplibre-react-native";
 import { Stack } from "expo-router";
 import { StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -6,6 +7,20 @@ import {
   useInvertColors,
 } from "@/contexts/InvertColorsContext";
 import { SavedStopsProvider } from "@/contexts/SavedStopsContext";
+
+const MAPLIBRE_CANCELED_REQUESTS = [
+  "Request failed due to a permanent error: Canceled",
+  "Request failed due to a permanent error: stream was reset: CANCEL",
+] as const;
+
+Logger.setLogCallback((log) => {
+  return (
+    log.tag === "Mbgl-HttpRequest" &&
+    MAPLIBRE_CANCELED_REQUESTS.some((message) =>
+      log.message.startsWith(message)
+    )
+  );
+});
 
 function RootNavigation() {
   const { invertColors } = useInvertColors();
