@@ -12,7 +12,8 @@ const REFRESH_INTERVAL_MS = 10_000;
 export function useStopDetails(atcoCode?: string) {
   const [stop, setStop] = useState<BusStop | null>(null);
   const [departures, setDepartures] = useState<Departure[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isStopLoading, setIsStopLoading] = useState(true);
+  const [isDeparturesLoading, setIsDeparturesLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchDepartures = useCallback(
@@ -38,24 +39,30 @@ export function useStopDetails(atcoCode?: string) {
     let isActive = true;
 
     if (!atcoCode) {
+      setStop(null);
+      setDepartures([]);
+      setError(null);
+      setIsStopLoading(false);
+      setIsDeparturesLoading(false);
+
       return () => {
         isActive = false;
       };
     }
 
-    setIsLoading(true);
+    setStop(null);
+    setDepartures([]);
+    setError(null);
+    setIsStopLoading(true);
+    setIsDeparturesLoading(true);
 
-    Promise.all([
-      getStop(atcoCode),
-      getStopDepartures(atcoCode).catch(() => []),
-    ])
-      .then(([stopData, departuresData]) => {
+    getStop(atcoCode)
+      .then((stopData) => {
         if (!isActive) {
           return;
         }
 
         setStop(stopData);
-        setDepartures(departuresData);
         setError(null);
       })
       .catch((err: unknown) => {
@@ -70,7 +77,30 @@ export function useStopDetails(atcoCode?: string) {
           return;
         }
 
-        setIsLoading(false);
+        setIsStopLoading(false);
+      });
+
+    getStopDepartures(atcoCode)
+      .then((departuresData) => {
+        if (!isActive) {
+          return;
+        }
+
+        setDepartures(departuresData);
+      })
+      .catch(() => {
+        if (!isActive) {
+          return;
+        }
+
+        setDepartures([]);
+      })
+      .finally(() => {
+        if (!isActive) {
+          return;
+        }
+
+        setIsDeparturesLoading(false);
       });
 
     return () => {
@@ -79,14 +109,15 @@ export function useStopDetails(atcoCode?: string) {
   }, [atcoCode]);
 
   useFocusedPolling(fetchDepartures, {
-    enabled: Boolean(atcoCode) && !isLoading,
+    enabled: Boolean(atcoCode) && !isStopLoading,
     intervalMs: REFRESH_INTERVAL_MS,
   });
 
   return {
     departures,
     error,
-    isLoading,
+    isDeparturesLoading,
+    isLoading: isStopLoading,
     stop,
   };
 }

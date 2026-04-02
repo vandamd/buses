@@ -31,6 +31,7 @@ interface TimetableRowProps {
 interface TimetableSectionProps {
   atcoCode: string;
   departures: Departure[];
+  isLoading: boolean;
 }
 
 function DetailSection({ title, children }: DetailSectionProps) {
@@ -171,7 +172,11 @@ function TimetableRow({
   );
 }
 
-function TimetableSection({ atcoCode, departures }: TimetableSectionProps) {
+function TimetableSection({
+  atcoCode,
+  departures,
+  isLoading,
+}: TimetableSectionProps) {
   const [serviceWidths, setServiceWidths] = useState<Record<string, number>>(
     {}
   );
@@ -204,24 +209,28 @@ function TimetableSection({ atcoCode, departures }: TimetableSectionProps) {
       return Math.max(widest, serviceWidths[departure.service] ?? 0);
     }, 0) || undefined;
 
-  return (
-    <DetailSection title="Timetable">
-      {departures.length > 0 ? (
-        departures.map((departure) => (
-          <TimetableRow
-            departure={departure}
-            isServiceWidthReady={areAllServiceWidthsMeasured}
-            key={getDepartureKey(departure)}
-            onMeasureServiceWidth={handleMeasureServiceWidth}
-            serviceWidth={serviceWidth}
-            stopAtcoCode={atcoCode}
-          />
-        ))
-      ) : (
-        <StyledText style={styles.largeText}>No upcoming departures</StyledText>
-      )}
-    </DetailSection>
-  );
+  let content: ReactNode;
+
+  if (isLoading) {
+    content = <StyledText style={styles.largeText}>Loading...</StyledText>;
+  } else if (departures.length > 0) {
+    content = departures.map((departure) => (
+      <TimetableRow
+        departure={departure}
+        isServiceWidthReady={areAllServiceWidthsMeasured}
+        key={getDepartureKey(departure)}
+        onMeasureServiceWidth={handleMeasureServiceWidth}
+        serviceWidth={serviceWidth}
+        stopAtcoCode={atcoCode}
+      />
+    ));
+  } else {
+    content = (
+      <StyledText style={styles.largeText}>No upcoming departures</StyledText>
+    );
+  }
+
+  return <DetailSection title="Timetable">{content}</DetailSection>;
 }
 
 function ErrorState({ message }: { message: string }) {
@@ -244,7 +253,8 @@ export default function StopDetailScreen() {
   }>();
   const currentTime = useCurrentTime();
   const { addStop, removeStop, isStopSaved } = useSavedStops();
-  const { stop, departures, isLoading, error } = useStopDetails(atcoCode);
+  const { stop, departures, isLoading, isDeparturesLoading, error } =
+    useStopDetails(atcoCode);
 
   const isSaved = stop ? isStopSaved(stop.atco_code) : false;
   const fallbackRoutes = parseLineNamesParam(passedLineNames);
@@ -286,7 +296,11 @@ export default function StopDetailScreen() {
     >
       <StopNameSection stopName={stopName} />
       <ServicesSection routes={routes} />
-      <TimetableSection atcoCode={atcoCode} departures={departures} />
+      <TimetableSection
+        atcoCode={atcoCode}
+        departures={departures}
+        isLoading={isDeparturesLoading}
+      />
     </ContentContainer>
   );
 }
